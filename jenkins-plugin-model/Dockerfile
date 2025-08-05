@@ -1,21 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS builder
 
-WORKDIR /app
-COPY src/Pi.Math/Pi.Math.csproj ./Pi.Math/
-COPY src/Pi.Runtime/Pi.Runtime.csproj ./Pi.Runtime/
-COPY src/Pi.Web/Pi.Web.csproj ./Pi.Web/
+WORKDIR /jenkins-plugin-model/src
+COPY jenkins-plugin-model/src/Pi.Math/Pi.Math.csproj ./Pi.Math/
+COPY jenkins-plugin-model/src/Pi.Runtime/Pi.Runtime.csproj ./Pi.Runtime/
+COPY jenkins-plugin-model/src/Pi.Web/Pi.Web.csproj ./Pi.Web/
 
-COPY src/Pi.Math ./Pi.Math/
-COPY src/Pi.Runtime ./Pi.Runtime/
-COPY src/Pi.Web ./Pi.Web/
-
-WORKDIR /app/Pi.Web
+WORKDIR /jenkins-plugin-model//src/Pi.Web
 RUN dotnet restore
-RUN dotnet publish -c Release -o out
 
+# app image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
-WORKDIR /app
-COPY --from=builder /app/Pi.Web/out .
 
 EXPOSE 80
 ENTRYPOINT ["dotnet", "Pi.Web.dll"]
+CMD ["-m", "console", "-dp", "6"]
